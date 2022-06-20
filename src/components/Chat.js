@@ -1,15 +1,24 @@
-import React, { useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useChats } from '../contexts/ChatsProvider';
 
 export default function Chat() {
-  const { selectedChat } = useChats()
-
+  const [text, setText] = useState('')
   const setRef = useCallback(node => {
     if (node) {
       node.scrollIntoView({ smooth: true })
     }
   }, [])
+  const { sendMessage, selectedChat } = useChats()
 
+  function handleSubmit(e) {
+    e.preventDefault()
+
+    sendMessage(
+      selectedChat.recipients.map(r => r.email),
+      text
+    )
+    setText('')
+  }
 
   return (
     <div className="chat-container">
@@ -40,11 +49,13 @@ export default function Chat() {
           })}
         </div>
       </div>
-      <form className='message-input-container' >
+      <form onSubmit={handleSubmit} className='message-input-container' >
         <div>
           <textarea
             required
             name="message"
+            value={text}
+            onChange={e => setText(e.target.value)}
           />
           <button type="submit" className='send-button'>Send</button>
 
